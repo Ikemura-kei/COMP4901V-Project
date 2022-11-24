@@ -17,7 +17,7 @@
   <!-- <include file="$(find turtlebot3_navigation)/launch/amcl.launch"/> -->
 
   <!-- move_base -->
-  <include file="$(find onebot_navigation)/launch/move_base.launch">
+  <include file="$(find hkust_rgd_navigation)/launch/move_base.launch">
     <!-- <arg name="model" value="$(arg model)" /> -->
   </include>
 
