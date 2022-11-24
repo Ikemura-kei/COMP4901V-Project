@@ -1,2 +1,4 @@
 Header header
-string msg
+string action
+string target
+string location

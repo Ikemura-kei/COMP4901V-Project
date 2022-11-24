@@ -8,9 +8,9 @@ local_costmap:
 
   static_map: false  
   rolling_window: true
-  width: 3
-  height: 3
-  resolution: 0.05
+  width: 3.1
+  height: 2.45
+  resolution: 0.2
 
   # plugins: {name: static_layer, type: "costmap_2d::StaticLayer"} - {name: obstacle_layer, type: "costmap_2d::VoxelLayer"} - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
   # observation_sources: point_cloud_sensor

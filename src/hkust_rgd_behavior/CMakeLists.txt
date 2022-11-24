@@ -122,13 +122,19 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 add_executable(rgd_control_node src/RgdControlNode.cpp)
 add_dependencies(rgd_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(rgd_control_node
+  ${catkin_LIBRARIES}
+)
+
+add_executable(behavior_node src/BehaviorNode.cpp src/Actions.cpp src/Targets.cpp src/Locations.cpp)
+add_dependencies(behavior_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(behavior_node
   ${catkin_LIBRARIES}
 )
 ## Declare a C++ library
