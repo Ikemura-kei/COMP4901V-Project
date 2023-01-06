@@ -8,6 +8,7 @@
     <xacro:include filename="$(find onebot_description)/urdf/wheel.urdf.xacro" />
     <xacro:include filename="$(find onebot_description)/urdf/materials.urdf.xacro" />
     <xacro:include filename="$(find onebot_description)/urdf/onebot.urdf.gazebo" />
+    <!-- <xacro:include filename="$(find onebot_description)/urdf/macro.xacro" /> -->
 
 
     <xacro:arg name="mesh_enabled" default="false" />
@@ -57,6 +58,38 @@
     <origin xyz="${mono_cam_x_pos} -${mono_cam_y_pos} 0.035" rpy="0 0 -1.75"/>
     <parent link="base_link"/>
     <child link="camera_left_link"/>
+  </joint>
+
+
+  <link name="sensor_laser">
+    <inertial>
+        <origin xyz="0 0.6 0.2" rpy="0 0 0" />
+        <mass value="0.001" />
+        <inertia  ixx="${0.001*(3*0.04*0.04+0.1*0.1)/12}" ixy = "0" ixz = "0"
+            iyy="${0.001*(3*0.04*0.04+0.1*0.1)/12}" iyz = "0"
+            izz="${0.001*(0.04*0.04)/2}" />
+    </inertial>
+
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+        <cylinder radius="0.05" length="0.1"/>
+        </geometry>
+        <material name="white" />
+    </visual>
+
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+        <cylinder radius="0.05" length="0.1"/>
+        </geometry>
+    </collision>
+    </link>
+
+    <joint name="joint_sensor_laser" type="fixed">
+    <origin xyz="-0.25 0 0.05" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="sensor_laser"/>
   </joint>
 
   <!-- Camera Left -->
