@@ -1,0 +1,6 @@
+<launch>
+<remap from="cloud_in" to="tranformed_cloud_point"/>
+<node name="pnt2laser" pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node">
+<rosparam command="load" file="$(find hkust_rgd_mapping)/params/param.yaml" />
+</node>
+</launch>
