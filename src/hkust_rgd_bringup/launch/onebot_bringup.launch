@@ -12,7 +12,7 @@
 
     <!-- launch gazebo empty world -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find hkust_rgd_bringup)/world/default.world"/>
+        <arg name="world_name" value="$(find hkust_rgd_bringup)/world/static_1.world"/>
         <arg name="paused" value="$(arg paused)"/>
         <arg name="use_sim_time" value="$(arg use_sim_time)"/>
         <arg name="gui" value="$(arg gui)"/>
@@ -59,7 +59,9 @@
 
     <include file="$(find hkust_rgd_navigation)/launch/navigation.launch" />
 
-    <!-- <node name="rgd_behavior" pkg="hkust_rgd_behavior" type="behavior_node" /> -->
+    <node name="hkust_rgd_behavior" pkg="hkust_rgd_behavior" type="behavior_node" />
+
+    <node name="hkust_rgd_gesture_recog" pkg="hkust_rgd_gesture_recog" type="gesture_recog_node.py" output="screen"/>
 
 </launch>
 

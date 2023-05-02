@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <hkust_rgd_msgs/voice_cast.h>
 #include <hkust_rgd_msgs/rgd_command.h>
+#include <hkust_rgd_msgs/gestures.h>
 #include <iostream>
 #include <move_base_msgs/MoveBaseActionGoal.h>
 #include <tf2_ros/transform_listener.h>
@@ -46,7 +47,9 @@ char getch()
     return (buf);
 }
 
-static const float NAV_GOAL_OFFSET = 2.8f;
+static const float NAV_GOAL_OFFSET = 1.55f;
+static const float TIMEOUT = 10.65f;
+static const float FORWARD_EXE_COOLDOWN = 1.578;
 
 static move_base_msgs::MoveBaseActionGoal navGoal;
 static actionlib_msgs::GoalID cancelNavCmd; // leave empty is ok, by default means cancel
@@ -68,29 +71,38 @@ void localMapCb(const nav_msgs::OccupancyGrid msg)
     }
     map = msg;
 }
+hkust_rgd_msgs::gestures gestures;
+void gesturesCb(const hkust_rgd_msgs::gestures msg)
+{
+    gestures = msg;
+}
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "rgd_control_node");
+    gestures.msg = "NONE";
 
     ros::NodeHandle nh("~");
-
+    ROS_ERROR_STREAM("--> Let's go");
+    float lastRxTime = ros::Time::now().toSec();
+    float lastForwardRxTime = ros::Time::now().toSec();
     // for publishing nav goal to move_base to navigate
     ros::Publisher navGoalPub = nh.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 100);
 
     // for publishing voice output message to feedback to user
-    ros::Publisher voiceOutputPub = nh.advertise<robot_message::voice_cast>("/voice_cast", 100);
+    // ros::Publisher voiceOutputPub = nh.advertise<robot_message::voice_cast>("/voice_cast", 100);
 
     ros::Publisher navCancelPub = nh.advertise<actionlib_msgs::GoalID>("/move_base/cancel", 1);
 
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener tfListener(tfBuffer);
 
-    ros::ServiceClient client = nh.serviceClient<robot_message::SLU>("/slu");
-    robot_message::SLU srv;
-    srv.request.header.seq = 1;
+    // ros::ServiceClient client = nh.serviceClient<robot_message::SLU>("/slu");
+    // robot_message::SLU srv;
+    // srv.request.header.seq = 1;
 
-    ros::Subscriber mapSubscriber = nh.subscribe("/projected_map", 1, localMapCb);
+    // ros::Subscriber mapSubscriber = nh.subscribe("/projected_map", 1, localMapCb);
+    ros::Subscriber gestureSubscriber = nh.subscribe("/gestures", 1, gesturesCb);
 
     navGoal.goal.target_pose.header.frame_id = "odom";
 
@@ -98,20 +110,20 @@ int main(int argc, char **argv)
     {
         ros::spinOnce();
 
-        ros::Rate(2).sleep();
+        ros::Rate(3).sleep();
 
-        char key = getch();
+        // char key = getch();
 
         // RECEIVE MESSAGE
-        if (client.call(srv))
-        {
-        }
-        else
-        {
-            ROS_ERROR("Failed to call");
-            continue;
-        }
-        std::cout << srv.response.action << std::endl;
+        // if (client.call(srv))
+        // {
+        // }
+        // else
+        // {
+        //     ROS_ERROR("Failed to call");
+        //     continue;
+        // }
+        // std::cout << srv.response.action << std::endl;
         // DEBUG MODE
         // std::cout << "\n"
         //           << key << std::endl;
@@ -125,10 +137,25 @@ int main(int argc, char **argv)
         //     message = "please stop";
 
         // DECODE MESSAGE
-        mapStr2Action(std::string(srv.response.action).c_str(), &action);
-        mapStr2Target(std::string(srv.response.action).c_str(), &target);
-        mapStr2Location(std::string(srv.response.action).c_str(), &location);
-
+        // mapStr2Target(std::string(srv.response.action).c_str(), &target);
+        // mapStr2Action(std::string(srv.response.action).c_str(), &action);
+        // mapStr2Location(std::string(srv.response.action).c_str(), &location);
+        ROS_WARN_STREAM("--> Current gesture message: " << gestures.msg);
+        if (strcmp(gestures.msg.c_str(), "NONE") == 0)
+        {
+            float dur = ros::Time::now().toSec() - lastRxTime;
+            if (dur > TIMEOUT)
+            {
+                ROS_WARN_STREAM("--> Timeout! Manually stop");
+                gestures.msg = "stop";
+            }
+            else
+                continue;
+        }
+        else{
+            lastRxTime = ros::Time::now().toSec();
+        }
+        mapStr2Action(gestures.msg.c_str(), &action);
         // GET THE CURRENT ROBOT POSITION AND ORIENTATION
         geometry_msgs::TransformStamped transformStamped;
         geometry_msgs::PointStamped goalPntAtBaseFootPrint;
@@ -171,12 +198,18 @@ int main(int argc, char **argv)
 
         case Action::ACTION_MOVE_FORWARD:
         {
-            std::cout << "go \n";
+            if ((ros::Time::now().toSec() - lastForwardRxTime) < FORWARD_EXE_COOLDOWN)
+            {
+                break;
+            }
+
+            lastForwardRxTime = ros::Time::now().toSec();
+            ROS_WARN_STREAM("--> Forward execution");
             voiceMsg.msg = "going forward, going forward";
 
             tf2::Quaternion rotQ(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, transformStamped.transform.rotation.w);
             tf2::Quaternion rotQInv(transformStamped.transform.rotation.x, transformStamped.transform.rotation.y, transformStamped.transform.rotation.z, -transformStamped.transform.rotation.w);
-            tf2::Quaternion frontVecQ_base_footprint(-NAV_GOAL_OFFSET, 0, 0, 0);
+            tf2::Quaternion frontVecQ_base_footprint(-NAV_GOAL_OFFSET * 1.5f, 0, 0, 0);
             tf2::Quaternion frontVecQ_odom = rotQ * frontVecQ_base_footprint * rotQInv; // check this ?frame to ?frame
 
             // set a nav goal to go to the forward for some distance
@@ -264,9 +297,9 @@ int main(int argc, char **argv)
         }
 
         navGoal.header.seq += 1;
-        voiceMsg.header.frame_id = "both";
-        voiceMsg.prefix = "notice";
+        // voiceMsg.header.frame_id = "both";
+        // voiceMsg.prefix = "notice";
 
-        voiceOutputPub.publish(voiceMsg);
+        // voiceOutputPub.publish(voiceMsg);
     }
 }

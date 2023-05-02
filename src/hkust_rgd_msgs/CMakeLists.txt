@@ -24,6 +24,7 @@ add_message_files(
   rgd_cmd/rgd_command.msg
   dynamic_obstacles/dynamic_obstacles.msg
   agent_actions/agent_actions.msg
+  gestures/gestures.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

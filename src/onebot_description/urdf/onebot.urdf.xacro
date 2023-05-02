@@ -63,7 +63,7 @@
 
   <link name="sensor_laser">
     <inertial>
-        <origin xyz="0 0.6 0.2" rpy="0 0 0" />
+        <origin xyz="0 0.6 1.2" rpy="0 0 0" />
         <mass value="0.001" />
         <inertia  ixx="${0.001*(3*0.04*0.04+0.1*0.1)/12}" ixy = "0" ixz = "0"
             iyy="${0.001*(3*0.04*0.04+0.1*0.1)/12}" iyz = "0"
@@ -87,7 +87,7 @@
     </link>
 
     <joint name="joint_sensor_laser" type="fixed">
-    <origin xyz="-0.25 0 0.05" rpy="0 0 0"/>
+    <origin xyz="-0.25 0 0.151" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="sensor_laser"/>
   </joint>

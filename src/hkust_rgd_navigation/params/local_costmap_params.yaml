@@ -2,16 +2,17 @@ local_costmap:
   global_frame: odom
   robot_base_frame: base_footprint
 
-  update_frequency: 10.0
+  update_frequency: 15.0
   publish_frequency: 10.0
   transform_tolerance: 0.5  
 
   static_map: false  
   rolling_window: true
-  width: 3.1
-  height: 2.45
-  resolution: 0.2
-
+  width: 18
+  height: 20
+  resolution: 0.35
+  observation_sources: scan
+  scan: {data_type: LaserScan, topic: /m2wr/laser/scan, marking: true, clearing: true, observation_persistence: 0.0}
   # plugins: {name: static_layer, type: "costmap_2d::StaticLayer"} - {name: obstacle_layer, type: "costmap_2d::VoxelLayer"} - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
   # observation_sources: point_cloud_sensor
   # point_cloud_sensor: {sensor_frame: adjusted_camera_link, data_type: PointCloud2, topic: tranformed_cloud_point, marking: true, clearing: true}

@@ -10,4 +10,7 @@ logs/
 .catkin_tools/
 .vscode/
 
+RMUC*
+
+*.pt
 
