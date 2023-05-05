@@ -26,11 +26,18 @@ gesture_num = 0
 
 
 class MyThread(threading.Thread):
-    def __init__(self, q):
+    def __init__(self, q, custom_gesture_register):
         threading.Thread.__init__(self)
         self.q = q
+        self.custom_gesture_register = custom_gesture_register
 
     def run(self):
+        # print("--> My location", __file__)
+        data_file = config.get("Collection", "data_file")
+        data_file = os.path.join(__file__.replace("src/hkust_rgd_gesture_recog/data_gathering.py", ""), data_file)
+        if self.custom_gesture_register:
+            data_file = data_file.replace("gesture.data", "custom.data")
+        print("--> Use data file to collect data: ", data_file)
         data = csv.writer(open(data_file, "w"))
         data.writerow(["id", "gesture_num", "gesture",
                        "wrist_x", "wrist_y", "wrist_z",
@@ -45,17 +52,17 @@ class MyThread(threading.Thread):
                        "pinky_cmc_x", "pinky_mcp_x", "pinky_ip_x", "pinky_tip_x", "pinky_cmc_y", "pinky_mcp_y", "pinky_ip_y",
                        "pinky_tip_y", "pinky_cmc_z", "pinky_mcp_z", "pinky_ip_z", "pinky_tip_z",
                        ])
-        video_stream(self.q, data)
+        video_stream(self.q, data, self.custom_gesture_register)
 
 
 def flatten(l):
     return [item for sublist in l for item in [sublist.x, sublist.y, sublist.z]]
 
-gestures = ["forward", "left", "right", "stop"]
 cnt = 0
-def video_stream(q, data):
+gestures = ["forward", "left", "right", "stop", "voice"]
+def video_stream(q, data, custom_gesture_register):
     global data_id, gesture_num, runningFlag, cnt
-    while cnt < len(gestures):
+    while cnt < (len(gestures) if not custom_gesture_register else 2):
         key = input("Please press enter to start recording gestures for command: {}. (press q to give-up)".format(gestures[cnt]))
         if key == "q":
             break
@@ -64,7 +71,7 @@ def video_stream(q, data):
         sub_total = 0
         start_time = time.time()
         while True:
-            time.sleep(0.1) # record gestures in 10Hz
+            time.sleep(0.01) # record gestures in 100Hz
             for i in range(image_per_gesture):
                 semaphore.release()
                 l = flatten(workQueue.get())
@@ -76,21 +83,21 @@ def video_stream(q, data):
                 sub_total += 1
             if sub_total % 150 == 0:
                 print("Done recording gesture " + name + " for " + str(sub_total) + " images")
-            if (time.time() - start_time) > 60.0 and sub_total > 2000:
+            if (time.time() - start_time) > 25.0 and sub_total > 900:
                 break
         cnt += 1 # increment indicating we have recorded "cnt" number of gestures
     runningFlag = False
 
 
 
-def getDataset(v, mh, md, h):
+def getDataset(v, mh, md, h, custom_gesture_register):
     global cap, mp_hands, mp_draw, hands
     cap = v
     mp_hands = mh
     mp_draw = md
     hands = h
 
-    thread = MyThread(workQueue)
+    thread = MyThread(workQueue, custom_gesture_register)
     thread.start()
 
     while runningFlag:

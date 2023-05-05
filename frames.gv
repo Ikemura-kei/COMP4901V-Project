@@ -1,0 +1,21 @@
+digraph G {
+"base_link" -> "left_wheel_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 50.22\nBuffer length: 4.54\nMost recent transform: 46.287\nOldest transform: 41.747\n"];
+"base_footprint" -> "base_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "rear_caster_base"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 50.22\nBuffer length: 4.54\nMost recent transform: 46.287\nOldest transform: 41.747\n"];
+"rear_caster_base" -> "rear_caster_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 50.22\nBuffer length: 4.54\nMost recent transform: 46.287\nOldest transform: 41.747\n"];
+"base_link" -> "right_wheel_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 50.22\nBuffer length: 4.54\nMost recent transform: 46.287\nOldest transform: 41.747\n"];
+"world" -> "camera"[label=" Broadcaster: /orb_slam3\nAverage rate: 6.625\nBuffer length: 4.528\nMost recent transform: 46.121\nOldest transform: 41.593\n"];
+"super_world" -> "world"[label=" Broadcaster: /super_world_broadcaster\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"adjusted_camera_link" -> "base_footprint"[label=" Broadcaster: /base_footprint_broadcaster\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "camera_left_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "camera_right_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "imu_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "sensor_laser"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "stereo_camera_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera" -> "adjusted_camera_link"[label=" Broadcaster: /adjusted_camera_broadcaster\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"map" -> "super_world"[label=" Broadcaster: /map_broadcaster\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1683234977.1089704"[ shape=plaintext ] ;
+}->"map";
+}

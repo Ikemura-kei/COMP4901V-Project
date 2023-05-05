@@ -1,0 +1,33 @@
+<launch>
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="super_world_broadcaster" args="0 0 0 1.5707963 -1.5707963 0 super_world world" /> -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="super_world_broadcaster" args="0 0 0 -1.5707963 0 -1.5707963 super_world world" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_broadcaster" args="0 0 0 0 0 0 map super_world" />
+  
+
+
+<node pkg="tf2_ros" type="static_transform_publisher" name="adjusted_camera_broadcaster" args="0 0 0 0 0 0 camera adjusted_camera_link" />
+<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="adjusted_camera_broadcaster" args="0 0 0 -1.5707963 0 0 camera adjusted_camera_link" /> -->
+
+<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 adjusted_camera_link base_footprint" /> -->
+<node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 1.5707963 -1.5707963 0 adjusted_camera_link base_footprint" />
+
+<node pkg="onebot_mapping" type="transform_cloud_point" name="transform_cloud_point" />
+
+<node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+
+    <!-- resolution in meters per pixel -->
+    <param name="resolution" value="0.05" />
+
+    <!-- name of the fixed frame, needs to be "/map" for SLAM -->
+    <param name="frame_id" type="string" value="super_world" />
+
+    <param name = "height_map" value = "true" />
+    <param name = "colored_map" value = "false" /> 
+    <param name = "filter_ground" value = "false" />
+    <param name = "latch" value="false"/>
+    <param name = "occupancy_min_z" value="0.09"/>
+
+    <!-- topic from where pointcloud2 messages are subscribed -->
+    <remap from="/cloud_in" to="/tranformed_cloud_point" />
+  </node>
+</launch>

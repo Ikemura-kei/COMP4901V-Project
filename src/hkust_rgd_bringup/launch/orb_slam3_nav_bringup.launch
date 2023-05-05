@@ -1,0 +1,10 @@
+<launch>
+
+<include file="$(find hkust_rgd_bringup)/launch/only_robot.launch" />
+<include file="$(find orb_slam3_ros)/launch/euroc_mono.launch" />
+<include file="$(find hkust_rgd_bringup)/launch/octomap_build_comp4901v.launch" />
+
+
+<include file="$(find hkust_rgd_navigation)/launch/navigation.launch" />
+
+</launch>

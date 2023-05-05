@@ -42,12 +42,17 @@ def verify(data_loader, used_model):
         return correct / total
 
 
-def train():
+def train(custom_gesture_register):
     global output_dict, training_data_file, training_model_file
     training_data_file = config.get("Training", "data_file")
     training_data_file = os.path.join(__file__.replace("src/hkust_rgd_gesture_recog/train.py", ""), training_data_file)
     training_model_file = config.get("Training", "model_file")
     training_model_file = os.path.join(__file__.replace("src/hkust_rgd_gesture_recog/train.py", ""), training_model_file)
+    if custom_gesture_register:
+        training_data_file = training_data_file.replace("gesture.data", "custom.data")
+        training_model_file = training_model_file.replace("model.pt", "custom.pt")
+    print("save model to: ", training_model_file)
+    print("--> Use the following data file for training:",training_data_file)
     csv_data = pd.read_csv(training_data_file, header=0)
     uni_cols = csv_data.iloc[np.unique(csv_data['gesture_num'], return_index=True)[1]]
     output_dict = dict(zip(uni_cols['gesture_num'] - 1, uni_cols['gesture']))

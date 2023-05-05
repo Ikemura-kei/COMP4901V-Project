@@ -24,7 +24,7 @@ ros::NodeHandle nh;
 transformedCloudPointPub_ = nh.advertise<sensor_msgs::PointCloud2>("tranformed_cloud_point", 100);
 transformedCloudPointPub = &transformedCloudPointPub_;
 
-ros::Subscriber rawCloudPointSub = nh.subscribe("/stereo_camera/depth/points", 1000, rawPointCloudCb);
+ros::Subscriber rawCloudPointSub = nh.subscribe("/orb_slam3/all_points", 1000, rawPointCloudCb);
 
 while(ros::ok())
 {

@@ -22,6 +22,10 @@ void mapStr2Action(const char *str, Action *actionOut)
     {
         *actionOut = Action::ACTION_STOP;
     }
+    else if (std::string(str).find("voice") != std::string::npos)
+    {
+        *actionOut = Action::ACTION_VOICE;
+    }
     else
     {
         *actionOut = Action::ACTION_NONE;

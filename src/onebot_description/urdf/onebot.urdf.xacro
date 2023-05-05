@@ -55,7 +55,7 @@
 <!-- Camera Joint Left -->
   <joint name="camera_left_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="${mono_cam_x_pos} -${mono_cam_y_pos} 0.035" rpy="0 0 -1.75"/>
+    <origin xyz="${mono_cam_x_pos} -${mono_cam_y_pos} 0.035" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="camera_left_link"/>
   </joint>

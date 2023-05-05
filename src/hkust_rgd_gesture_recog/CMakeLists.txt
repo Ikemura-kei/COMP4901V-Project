@@ -118,7 +118,10 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
-
+catkin_python_setup()
+catkin_install_python(PROGRAMS scripts/gesture_recog_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/hkust_rgd_gesture_recog.cpp
@@ -176,10 +179,7 @@ include_directories(
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
 # )
-catkin_python_setup()
-catkin_install_python(PROGRAMS scripts/gesture_recog_node.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

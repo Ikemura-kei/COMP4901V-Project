@@ -59,9 +59,7 @@
 
     <include file="$(find hkust_rgd_navigation)/launch/navigation.launch" />
 
-    <node name="hkust_rgd_behavior" pkg="hkust_rgd_behavior" type="behavior_node" />
-
-    <node name="hkust_rgd_gesture_recog" pkg="hkust_rgd_gesture_recog" type="gesture_recog_node.py" output="screen"/>
+    
 
 </launch>
 

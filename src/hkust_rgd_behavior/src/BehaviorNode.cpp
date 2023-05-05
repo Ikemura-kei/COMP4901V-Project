@@ -49,7 +49,8 @@ char getch()
 
 static const float NAV_GOAL_OFFSET = 1.55f;
 static const float TIMEOUT = 10.65f;
-static const float FORWARD_EXE_COOLDOWN = 1.578;
+static const float COOLDOWN = 2.5f;
+static const float FORWARD_EXE_COOLDOWN = 3.578;
 
 static move_base_msgs::MoveBaseActionGoal navGoal;
 static actionlib_msgs::GoalID cancelNavCmd; // leave empty is ok, by default means cancel
@@ -90,51 +91,31 @@ int main(int argc, char **argv)
     ros::Publisher navGoalPub = nh.advertise<move_base_msgs::MoveBaseActionGoal>("/move_base/goal", 100);
 
     // for publishing voice output message to feedback to user
-    // ros::Publisher voiceOutputPub = nh.advertise<robot_message::voice_cast>("/voice_cast", 100);
+    ros::Publisher voiceOutputPub = nh.advertise<robot_message::voice_cast>("/voice_cast", 100);
 
     ros::Publisher navCancelPub = nh.advertise<actionlib_msgs::GoalID>("/move_base/cancel", 1);
 
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener tfListener(tfBuffer);
 
-    // ros::ServiceClient client = nh.serviceClient<robot_message::SLU>("/slu");
-    // robot_message::SLU srv;
-    // srv.request.header.seq = 1;
+    ros::ServiceClient client = nh.serviceClient<robot_message::SLU>("/slu");
+    robot_message::SLU srv;
+    srv.request.header.seq = 1;
 
     // ros::Subscriber mapSubscriber = nh.subscribe("/projected_map", 1, localMapCb);
     ros::Subscriber gestureSubscriber = nh.subscribe("/gestures", 1, gesturesCb);
 
     navGoal.goal.target_pose.header.frame_id = "odom";
-
+    Action lastAction;
+    float lastCmdTime = ros::Time::now().toSec();
     while (ros::ok())
     {
+        bool timeout = false;
         ros::spinOnce();
 
         ros::Rate(3).sleep();
 
         // char key = getch();
-
-        // RECEIVE MESSAGE
-        // if (client.call(srv))
-        // {
-        // }
-        // else
-        // {
-        //     ROS_ERROR("Failed to call");
-        //     continue;
-        // }
-        // std::cout << srv.response.action << std::endl;
-        // DEBUG MODE
-        // std::cout << "\n"
-        //           << key << std::endl;
-        // if (key == 'r')
-        //     message = "please move right";
-        // else if (key == 'l')
-        //     message = "please move left";
-        // else if (key == 'f')
-        //     message = "please move forward";
-        // else if (key == 's')
-        //     message = "please stop";
 
         // DECODE MESSAGE
         // mapStr2Target(std::string(srv.response.action).c_str(), &target);
@@ -148,6 +129,7 @@ int main(int argc, char **argv)
             {
                 ROS_WARN_STREAM("--> Timeout! Manually stop");
                 gestures.msg = "stop";
+                timeout = true;
             }
             else
                 continue;
@@ -183,6 +165,29 @@ int main(int argc, char **argv)
             ros::Duration(1.0).sleep();
             continue;
         }
+
+        if (action == Action::ACTION_VOICE)
+        {
+            ROS_WARN_STREAM("do voice");
+            // RECEIVE MESSAGE
+            if (client.call(srv))
+            {
+            }
+            else
+            {
+                ROS_ERROR("Failed to call");
+                continue;
+            }
+            ROS_WARN_STREAM("rx:" << srv.response.action);
+
+            mapStr2Action(std::string(srv.response.action).c_str(), &action);
+        }
+
+        if (lastAction == action && ((ros::Time::now().toSec() - lastCmdTime) < COOLDOWN))
+            continue;
+
+        lastCmdTime = ros::Time::now().toSec();
+        lastAction = action;
 
         // OPEN THIS FOR DEBUG
         // std::cout << "current robot position: "
@@ -297,9 +302,9 @@ int main(int argc, char **argv)
         }
 
         navGoal.header.seq += 1;
-        // voiceMsg.header.frame_id = "both";
-        // voiceMsg.prefix = "notice";
-
-        // voiceOutputPub.publish(voiceMsg);
+        voiceMsg.header.frame_id = "both";
+        voiceMsg.prefix = "notice";
+        if (!timeout)
+            voiceOutputPub.publish(voiceMsg);
     }
 }
