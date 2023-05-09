@@ -4,15 +4,17 @@
   <arg name="cmd_vel_topic" default="/velocity_controller/cmd_vel" />
 
   <!-- for non-slam use -->
-  <arg name="odom_topic" default="/odometry/filtered" />
+  <!-- <arg name="odom_topic" default="/odometry/filtered" /> -->
 
   <!-- for slam use -->
-  <!-- <arg name="odom_topic" default="/velocity_controller/odom" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="odom_broadcaster" args="0 0 0 0 0 0 odom map" /> -->
+  <arg name="odom_topic" default="/velocity_controller/odom" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="odom_broadcaster" args="0 0 0 0 0 0 odom map" />
 
 
 <param name="use_sim_time" value="true"/>
-  <!-- <remap from="/map" to="/projected_map"/> -->
+  <!-- for orb-slam3 use -->
+  <remap from="/map" to="/projected_map"/>
+
   <!-- move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />

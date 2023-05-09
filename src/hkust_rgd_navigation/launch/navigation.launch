@@ -10,10 +10,10 @@
     <arg name="model" value="$(arg model)" />
   </include> -->
 
-  <!-- Map server -->
+  <!-- Map server, for non-slam case's use -->
   <!-- <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/> -->
 
-  <!-- AMCL -->
+  <!-- AMCL, for non-slam case's use -->
   <!-- <include file="$(find turtlebot3_navigation)/launch/amcl.launch"/> -->
 
   <!-- move_base -->
